@@ -7,8 +7,9 @@ const instance = new Razorpay({
 });
 
 const paymentSuccess = async (req, res) => {
+  console.log("check");
   const { orderCreationId, razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
-
+  console.log("check payment");
   // Return If Partial Information Provided
   if (
     orderCreationId === undefined ||
@@ -41,43 +42,24 @@ const paymentSuccess = async (req, res) => {
   }
 };
 
-const genRecieptId = (counter) => {
-  // Timestamp component (YYYYMMDDHHMMSS)
-  const currentDate = new Date();
-  const timestampComponent = currentDate.toISOString().slice(0, 19).replace(/[-:T]/g, "");
-
-  // Random component (5 digits)
-  const randomComponent = Math.floor(Math.random() * 100000)
-    .toString()
-    .padStart(5, "0");
-
-  // Counter Component - Resets every Day
-  const counterComponent = counter.toString().padStart(5, "0");
-
-  // UserId
-  const userId = timestampComponent + randomComponent + counterComponent;
-
-  return userId;
-};
-
 const createOrder = async (req, res) => {
-  const { total } = req.body;
+  const { totalAmt, cur } = req.body;
+  console.log(totalAmt)
   options = {
-    "amount": total*100,
-    "currency": "INR",
-    "receipt": genRecieptId(7),
-  }
-  if (total === undefined) {
+    amount: totalAmt * 100,
+    currency: cur,
+    receipt: "receipt_id",
+  };
+  if (totalAmt === undefined) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
 
   try {
     const order = await instance.orders.create(options);
-    console.log(order)
     if (!order) return res.status(404).json({ success: false, payload: { message: "Order Creation Failed" } });
-
     return res.status(201).json({ success: true, payload: { order, message: "Order Creation Successful" } });
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ success: false, payload: { message: "Order Creation Failed" } });
   }
 };

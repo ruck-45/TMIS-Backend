@@ -7,6 +7,6 @@ const router = express.Router();
 
 // routes
 router.route("/orders").post(createOrder);
-router.route("/success").post(paymentSuccess);
+router.route("/verify").post(paymentSuccess);
 
 module.exports = router;
