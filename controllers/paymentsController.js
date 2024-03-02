@@ -29,6 +29,7 @@ const genReceiptId = (counter) => {
 };
 
 const paymentSuccess = async (req, res) => {
+  console.log(req.body);
   const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
 
   // Return If Partial Information Provided
