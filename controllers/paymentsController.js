@@ -1,9 +1,8 @@
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 
-const { executeQuery } = require("../utils/database")
-const { createPaymentQuery } = require("../constants/queries")
-
+const { executeQuery } = require("../utils/database");
+const { createPaymentQuery } = require("../constants/queries");
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -30,19 +29,18 @@ const genReceiptId = (counter) => {
 };
 
 const paymentSuccess = async (req, res) => {
-  console.log(req.body)
   const {
-  userName,
-  email,
-  companyName,
-  phoneNumber,
-  address,
-  service,
-  plan,
-  razorpayPaymentId,
-  razorpayOrderId,
-  razorpaySignature,
-  amount
+    userName,
+    email,
+    companyName,
+    phoneNumber,
+    address,
+    service,
+    plan,
+    razorpayPaymentId,
+    razorpayOrderId,
+    razorpaySignature,
+    amount,
   } = req.body;
   // Return If Partial Information Provided
   if (
@@ -56,9 +54,9 @@ const paymentSuccess = async (req, res) => {
     address === undefined ||
     service === undefined ||
     plan === undefined
-    ) {
-      return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
-    }
+  ) {
+    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+  }
   const paymentInfo = {
     payment_id: razorpayPaymentId,
     order_id: razorpayOrderId,
@@ -67,16 +65,16 @@ const paymentSuccess = async (req, res) => {
     company_name: companyName,
     phone: phoneNumber,
     address: address,
-    service_1: service[0] || "", 
+    service_1: service[0] || "",
     plan_1: plan[0] || "",
-    service_2: service[1] || "", 
-    plan_2: plan[1] || "", 
-    service_3: service[2] || "", 
-    plan_3: plan[2] || "", 
-    service_4: service[3] || "", 
-    plan_4: plan[3] || "", 
-    currency: "INR", 
-    total_amount: amount, 
+    service_2: service[1] || "",
+    plan_2: plan[1] || "",
+    service_3: service[2] || "",
+    plan_3: plan[2] || "",
+    service_4: service[3] || "",
+    plan_4: plan[3] || "",
+    currency: "INR",
+    total_amount: amount,
   };
 
   const paymentParams = [
@@ -108,10 +106,8 @@ const paymentSuccess = async (req, res) => {
       return res.status(400).json({ success: false, payload: { message: "Signature Mismatch" } });
     }
 
-    const paymentQuery = await executeQuery(createPaymentQuery, paymentParams);
-    if (!paymentQuery.success) {
-      return res.status(400).json({ success: false, payload: { message: "Error while creating entry in payments table." } });
-    }
+    await executeQuery(createPaymentQuery, paymentParams);
+
     return res.json({
       success: true,
       payload: {
@@ -124,7 +120,6 @@ const paymentSuccess = async (req, res) => {
     return res.status(500).json({ success: false, payload: { message: "Payment Failed" } });
   }
 };
-
 
 const createOrder = async (req, res) => {
   const { totalAmt, cur, registerCounter } = req.body;
