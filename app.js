@@ -2,7 +2,7 @@
 require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
-const { testConnection, createPaymentsTable, createPlansTable } = require("./utils/database");
+const { testConnection, createPaymentsTable } = require("./utils/database");
 
 // Local Files
 const paymentRouter = require("./routes/payment");
@@ -21,7 +21,6 @@ app.use("/api/payment", paymentRouter);
 // Database Connection and Configuration
 testConnection();
 createPaymentsTable();
-createPlansTable();
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

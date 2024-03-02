@@ -1,6 +1,10 @@
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 
+const { executeQuery } = require("../utils/database")
+const { createPaymentQuery } = require("../constants/queries")
+
+
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_SECRET,
@@ -26,12 +30,74 @@ const genReceiptId = (counter) => {
 };
 
 const paymentSuccess = async (req, res) => {
-  const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
-
+  console.log(req.body)
+  const {
+  userName,
+  email,
+  companyName,
+  phoneNumber,
+  address,
+  service,
+  plan,
+  razorpayPaymentId,
+  razorpayOrderId,
+  razorpaySignature,
+  amount
+  } = req.body;
   // Return If Partial Information Provided
-  if (razorpayPaymentId === undefined || razorpayOrderId === undefined || razorpaySignature === undefined) {
-    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
-  }
+  if (
+    razorpayPaymentId === undefined ||
+    razorpayOrderId === undefined ||
+    razorpaySignature === undefined ||
+    userName === undefined ||
+    email === undefined ||
+    companyName === undefined ||
+    phoneNumber === undefined ||
+    address === undefined ||
+    service === undefined ||
+    plan === undefined
+    ) {
+      return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+    }
+  const paymentInfo = {
+    payment_id: razorpayPaymentId,
+    order_id: razorpayOrderId,
+    name: userName,
+    email: email,
+    company_name: companyName,
+    phone: phoneNumber,
+    address: address,
+    service_1: service[0] || "", 
+    plan_1: plan[0] || "",
+    service_2: service[1] || "", 
+    plan_2: plan[1] || "", 
+    service_3: service[2] || "", 
+    plan_3: plan[2] || "", 
+    service_4: service[3] || "", 
+    plan_4: plan[3] || "", 
+    currency: "INR", 
+    total_amount: amount, 
+  };
+
+  const paymentParams = [
+    paymentInfo.payment_id,
+    paymentInfo.order_id,
+    paymentInfo.name,
+    paymentInfo.email,
+    paymentInfo.company_name,
+    paymentInfo.phone,
+    paymentInfo.address,
+    paymentInfo.service_1,
+    paymentInfo.plan_1,
+    paymentInfo.service_2,
+    paymentInfo.plan_2,
+    paymentInfo.service_3,
+    paymentInfo.plan_3,
+    paymentInfo.service_4,
+    paymentInfo.plan_4,
+    paymentInfo.currency,
+    paymentInfo.total_amount,
+  ];
 
   try {
     const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
@@ -42,6 +108,10 @@ const paymentSuccess = async (req, res) => {
       return res.status(400).json({ success: false, payload: { message: "Signature Mismatch" } });
     }
 
+    const paymentQuery = await executeQuery(createPaymentQuery, paymentParams);
+    if (!paymentQuery.success) {
+      return res.status(400).json({ success: false, payload: { message: "Error while creating entry in payments table." } });
+    }
     return res.json({
       success: true,
       payload: {
@@ -54,6 +124,7 @@ const paymentSuccess = async (req, res) => {
     return res.status(500).json({ success: false, payload: { message: "Payment Failed" } });
   }
 };
+
 
 const createOrder = async (req, res) => {
   const { totalAmt, cur, registerCounter } = req.body;
