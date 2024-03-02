@@ -6,23 +6,36 @@ const instance = new Razorpay({
   key_secret: process.env.RAZORPAY_SECRET,
 });
 
+const genReceiptId = (counter) => {
+  // Timestamp component (YYYYMMDDHHMMSS)
+  const currentDate = new Date();
+  const timestampComponent = currentDate.toISOString().slice(0, 19).replace(/[-:T]/g, "");
+
+  // Random component (5 digits)
+  const randomComponent = Math.floor(Math.random() * 100000)
+    .toString()
+    .padStart(5, "0");
+
+  // Counter Component - Resets every Day
+  const counterComponent = counter.toString().padStart(5, "0");
+
+  // UserId
+  const rId = timestampComponent + randomComponent + counterComponent;
+
+  return rId;
+};
+
 const paymentSuccess = async (req, res) => {
-  console.log("check");
-  const { orderCreationId, razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
-  console.log("check payment");
+  const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
+
   // Return If Partial Information Provided
-  if (
-    orderCreationId === undefined ||
-    razorpayPaymentId === undefined ||
-    razorpayOrderId === undefined ||
-    razorpaySignature === undefined
-  ) {
+  if (razorpayPaymentId === undefined || razorpayOrderId === undefined || razorpaySignature === undefined) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
 
   try {
     const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
-    shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
+    shasum.update(`${razorpayOrderId}|${razorpayPaymentId}`);
     const digest = shasum.digest("hex");
 
     if (digest !== razorpaySignature) {
@@ -43,23 +56,25 @@ const paymentSuccess = async (req, res) => {
 };
 
 const createOrder = async (req, res) => {
-  const { totalAmt, cur } = req.body;
-  console.log(totalAmt)
+  const { totalAmt, cur, registerCounter } = req.body;
+
+  if (totalAmt === undefined || cur === undefined || registerCounter === undefined) {
+    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+  }
+
+  rId = genReceiptId(registerCounter);
+
   options = {
     amount: totalAmt * 100,
     currency: cur,
-    receipt: "receipt_id",
+    receipt: `${rId}`,
   };
-  if (totalAmt === undefined) {
-    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
-  }
 
   try {
     const order = await instance.orders.create(options);
     if (!order) return res.status(404).json({ success: false, payload: { message: "Order Creation Failed" } });
     return res.status(201).json({ success: true, payload: { order, message: "Order Creation Successful" } });
   } catch (error) {
-    console.log(error)
     return res.status(500).json({ success: false, payload: { message: "Order Creation Failed" } });
   }
 };
