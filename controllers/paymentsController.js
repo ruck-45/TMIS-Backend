@@ -82,7 +82,68 @@ const createOrder = async (req, res) => {
   }
 };
 
+const updateDatabase = async (req, res) => {
+  console.log(req.body);
+  const {
+    userName,
+    email,
+    companyName,
+    phoneNumber,
+    address,
+    service,
+    plan,
+    successReceiptId,
+    successOrderId,
+    amount,
+  } = req.body;
+  const paymentInfo = {
+    payment_id: successReceiptId,
+    order_id: successOrderId,
+    name: userName,
+    email: email,
+    company_name: companyName,
+    phone: phoneNumber,
+    address: address,
+    service_1: service[0] || "",
+    plan_1: plan[0] || "",
+    service_2: service[1] || "",
+    plan_2: plan[1] || "",
+    service_3: service[2] || "",
+    plan_3: plan[2] || "",
+    service_4: service[3] || "",
+    plan_4: plan[3] || "",
+    currency: "INR",
+    total_amount: amount / 100,
+  };
+  const paymentParams = [
+    paymentInfo.payment_id,
+    paymentInfo.order_id,
+    paymentInfo.name,
+    paymentInfo.email,
+    paymentInfo.company_name,
+    paymentInfo.phone,
+    paymentInfo.address,
+    paymentInfo.service_1,
+    paymentInfo.plan_1,
+    paymentInfo.service_2,
+    paymentInfo.plan_2,
+    paymentInfo.service_3,
+    paymentInfo.plan_3,
+    paymentInfo.service_4,
+    paymentInfo.plan_4,
+    paymentInfo.currency,
+    paymentInfo.total_amount,
+  ];
+  const createEntry = await executeQuery(createPaymentQuery, paymentParams);
+  console.log("createEntry", createEntry);
+  if (!createEntry.success) {
+    return res.status(404).json({ success: false, payload: { message: "Error while updating database." } });
+  }
+  return res.status(201).json({ success: true, payload: { message: "Entry created in databse succesfully." } });
+};
+
 module.exports = {
   createOrder,
   paymentSuccess,
+  updateDatabase,
 };
