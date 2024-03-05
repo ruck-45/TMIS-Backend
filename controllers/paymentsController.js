@@ -83,7 +83,6 @@ const createOrder = async (req, res) => {
 };
 
 const updateDatabase = async (req, res) => {
-  console.log(req.body);
   const {
     userName,
     email,
