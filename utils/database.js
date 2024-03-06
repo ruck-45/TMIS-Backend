@@ -1,5 +1,5 @@
 const pool = require("../config/databaseConfig");
-const { checkDatabaseQuery, createPaymentsTableQuery, createJobsContentTableQuery, createJobsTableQuery, createUsersTableQuery } = require("../constants/queries");
+const { checkDatabaseQuery, createPaymentsTableQuery, createJobsContentTableQuery, createJobsTableQuery, createUsersTableQuery, createApplicantstableQuery } = require("../constants/queries");
 
 const executeQuery = async (query, values = []) => {
   let success;
@@ -64,7 +64,14 @@ const createUsersTable = async () => {
   }
 };
 
-
+const createApplicantstable = async () => {
+  const res = await executeQuery(createApplicantstableQuery);
+  if (res.success) {
+    console.log(`Applicants Table Created Successfully`);
+  } else {
+    throw Error(res.result);
+  }
+};
 
 module.exports = {
   executeQuery,
@@ -73,4 +80,5 @@ module.exports = {
   createJobsContentTable,
   createJobsTable,
   createUsersTable,
+  createApplicantstable,
 };

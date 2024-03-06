@@ -82,7 +82,6 @@ const insertUserDetailsQuery = `
 
 const findUserByIdQuery = `SELECT * FROM users WHERE user_id = ?`;
 
-
 const getJobDetailsByIdQuery = `SELECT j.job_id, j.title, j.department, j.job_type, j.experience_level, j.location, j.skills, j.creation_date, jc.description, jc.role, jc.role_category, jc.industry, jc.required_education, jc.required_profile
                                 FROM Jobs j
                                 JOIN Jobs_content jc ON j.job_id = jc.job_id
@@ -91,15 +90,32 @@ const getJobDetailsByIdQuery = `SELECT j.job_id, j.title, j.department, j.job_ty
 const insertJobQuery = `INSERT INTO Jobs (job_id, title, department, job_type, experience_level, location, skills) 
                         VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-
 const insertJobContentQuery = `INSERT INTO Jobs_content (job_id, description, role, role_category, industry, required_education, required_profile) 
                                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
 
 const deleteContentQuery = `DELETE FROM Jobs_content WHERE job_id = ?`;
 const deleteJobQuery = `DELETE FROM Jobs WHERE job_id = ?`;
 const updateJobQuery = `UPDATE Jobs SET title=?, department=?, job_type=?, experience_level=?, location=?, skills=? WHERE job_id=?`;
 const updateJobContentQuery = `UPDATE Jobs_content SET description=?, role=?, role_category=?, industry=?, required_education=?, required_profile=? WHERE job_id=?`;
+
+const createApplicantstableQuery = `CREATE TABLE IF NOT EXISTS applicant (
+                                        applicant_id VARCHAR(255) PRIMARY KEY,
+                                        full_name VARCHAR(255) NOT NULL,
+                                        email VARCHAR(255) NOT NULL,
+                                        contact VARCHAR(15) NOT NULL,
+                                        graduation_year DATE NOT NULL,
+                                        gender VARCHAR(10),
+                                        experience_years INT,
+                                        current_employer VARCHAR(255),
+                                        current_ctc FLOAT,
+                                        expected_ctc FLOAT NOT NULL,
+                                        notice_period INT,
+                                        current_location VARCHAR(255) NOT NULL
+                                    )`;
+
+const createApplicantQuery = `INSERT INTO applicant (applicant_id, full_name, email, contact, graduation_year, gender, experience_years, current_employer, current_ctc, expected_ctc, notice_period, current_location) 
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
 
 module.exports = {
   checkDatabaseQuery,
@@ -117,4 +133,6 @@ module.exports = {
   deleteJobQuery,
   updateJobQuery,
   updateJobContentQuery,
+  createApplicantstableQuery,
+  createApplicantQuery,
 };

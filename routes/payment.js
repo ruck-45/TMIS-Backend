@@ -6,7 +6,7 @@ const { updateRegisterCounter } = require("../middlewares/usersMiddlewares");
 const router = express.Router();
 
 // routes
-router.route("/orders").post(createOrder);
+router.route("/orders").post(updateRegisterCounter, createOrder);
 router.route("/verify").post(paymentSuccess);
 router.route("/update").post(updateDatabase);
 

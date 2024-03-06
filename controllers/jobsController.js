@@ -9,6 +9,7 @@ const {
   updateJobQuery,
 } = require("../constants/queries");
 
+
 const genJobid = (counter) => {
   // Timestamp component (YYYYMMDDHHMMSS)
   const currentDate = new Date();
@@ -42,10 +43,11 @@ const createJob = async (req, res) => {
     industry,
     required_education,
     required_profile,
+    jobCounter,
   } = req.body;
 
   try {
-    const job_id = genJobid(7);
+    const job_id = genJobid(jobCounter);
     const query1 = await executeQuery(insertJobQuery, [
       job_id,
       title,
@@ -91,7 +93,6 @@ const deleteJob = async (req, res) => {
     }
 
     const deleteJobResult = await executeQuery(deleteJobQuery, [job_id]);
-    console.log("deleteJob", deleteJobResult);
     if (!deleteJobResult.success) {
       return res.status(404).json({ success: false, payload: { message: "Error while deleting job." } });
     }
