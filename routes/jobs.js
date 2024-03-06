@@ -1,15 +1,17 @@
 const express = require("express");
 const passport = require("passport");
-const { getActiveJobs, getJobDetails } = require("../controllers/jobsController")
+const { getActiveJobs, getJobDetailsById, createJob, deleteJob, updateJob } = require("../controllers/jobsController");
 
 const router = express.Router();
 
 
+// Public routes
 router.get("/activeJobs", getActiveJobs);
-router.get("/:id", getJobDetails);
+router.get("/:id", getJobDetailsById);
 
-// router.route("/signup").post(updateRegisterCounter, createUser);
-// router.route("/login").post(loginUser);
-
+// Private routes
+router.route("/createjob").post(passport.authenticate("jwt", { session: false }), createJob);
+router.route("/deleteJob/:id").delete(passport.authenticate("jwt", { session: false }), deleteJob);
+router.route("/updateJob/:id").put(passport.authenticate("jwt", { session: false}), updateJob);
 
 module.exports = router;

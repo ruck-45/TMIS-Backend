@@ -42,9 +42,6 @@ const createPaymentQuery = `
                                 total_amount
                             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-
-
-
 const createJobsTableQuery = `CREATE TABLE IF NOT EXISTS  Jobs (
                                 job_id VARCHAR(255) PRIMARY KEY,
                                 title VARCHAR(255) NOT NULL,
@@ -67,7 +64,6 @@ const createJobsContentTableQuery = `CREATE TABLE IF NOT EXISTS Jobs_content (
                                         FOREIGN KEY (job_id) REFERENCES Jobs(job_id)
                                     )`;
 
-
 const createUsersTableQuery = `
       CREATE TABLE IF NOT EXISTS users (
         user_id VARCHAR(30) PRIMARY KEY,
@@ -79,15 +75,31 @@ const createUsersTableQuery = `
       )
     `;
 
-
 const insertUserDetailsQuery = `
   INSERT INTO users (user_id, username, password_salt, password_hash, email)
   VALUES (?, ?, ?, ?, ?)
 `;
 
+const findUserByIdQuery = `SELECT * FROM users WHERE user_id = ?`;
 
-const findUserEmailQuery = `SELECT * FROM users WHERE email = ?`;
 
+const getJobDetailsByIdQuery = `SELECT j.job_id, j.title, j.department, j.job_type, j.experience_level, j.location, j.skills, j.creation_date, jc.description, jc.role, jc.role_category, jc.industry, jc.required_education, jc.required_profile
+                                FROM Jobs j
+                                JOIN Jobs_content jc ON j.job_id = jc.job_id
+                                WHERE j.job_id = ?`;
+
+const insertJobQuery = `INSERT INTO Jobs (job_id, title, department, job_type, experience_level, location, skills) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+
+const insertJobContentQuery = `INSERT INTO Jobs_content (job_id, description, role, role_category, industry, required_education, required_profile) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+
+const deleteContentQuery = `DELETE FROM Jobs_content WHERE job_id = ?`;
+const deleteJobQuery = `DELETE FROM Jobs WHERE job_id = ?`;
+const updateJobQuery = `UPDATE Jobs SET title=?, department=?, job_type=?, experience_level=?, location=?, skills=? WHERE job_id=?`;
+const updateJobContentQuery = `UPDATE Jobs_content SET description=?, role=?, role_category=?, industry=?, required_education=?, required_profile=? WHERE job_id=?`;
 
 module.exports = {
   checkDatabaseQuery,
@@ -97,5 +109,12 @@ module.exports = {
   createJobsContentTableQuery,
   createUsersTableQuery,
   insertUserDetailsQuery,
-  findUserEmailQuery,
+  findUserByIdQuery,
+  getJobDetailsByIdQuery,
+  insertJobQuery,
+  insertJobContentQuery,
+  deleteContentQuery,
+  deleteJobQuery,
+  updateJobQuery,
+  updateJobContentQuery,
 };
