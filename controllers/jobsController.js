@@ -80,7 +80,7 @@ const createJob = async (req, res) => {
 };
 
 const deleteJob = async (req, res) => {
-  const job_id = req.params.id;
+  const {id: job_id} = req.params;
   if (job_id === undefined) {
     return res.status(404).json({ success: false, payload: { message: "Job Id must be provided." } });
   }
@@ -215,7 +215,7 @@ const getActiveJobs = async (req, res) => {
 };
 
 const getJobDetailsById = async (req, res) => {
-  const jobId = req.params.id;
+  const {id: jobId} = req.params;
 
   if (jobId === undefined) {
     return res.status(404).json({ success: false, payload: { message: "Please Provide Job Id" } });
