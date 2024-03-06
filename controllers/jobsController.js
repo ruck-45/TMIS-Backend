@@ -20,32 +20,60 @@ const genJobid = (counter) => {
 };
 
 const getActiveJobs = async (req, res) => {
-  const { department, job_type, location, experience } = req.query;
+  const { department, jobType, location, experience, start, end } = req.query;
+  const limit_start = start ? parseInt(start, 10) : 0;
+  const limit_end = end ? parseInt(end, 10) : 8;
+
+  if (limit_start >= limit_end) {
+    return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
+  }
+
   let query = "SELECT * FROM Jobs WHERE 1=1";
+  let countQuery = "SELECT COUNT(*) AS totalJobs FROM Jobs WHERE 1=1";
 
   // Add filters based on query parameters
-  if (department) query += ` AND department = '${department}'`;
-  if (job_type) query += ` AND job_type = '${job_type}'`;
-  if (location) query += ` AND location = '${location}'`;
-  if (experience) query += ` AND experience_level = '${experience}'`;
+  if (department && department !== "All") {
+    query += ` AND department = '${department}'`;
+    countQuery += ` AND department = '${department}'`;
+  }
+  if (jobType && jobType !== "All") {
+    query += ` AND job_type = '${jobType}'`;
+    countQuery += ` AND job_type = '${jobType}'`;
+  }
+  if (location && location !== "All") {
+    query += ` AND location = '${location}'`;
+    countQuery += ` AND location = '${location}'`;
+  }
+  if (experience && experience !== "All") {
+    query += ` AND experience_level = '${experience}'`;
+    countQuery += ` AND experience_level = '${experience}'`;
+  }
+
+  query += ` LIMIT ${limit_end} OFFSET ${limit_start}`;
 
   console.log("query: " + query);
+  console.log("count-query: " + countQuery);
+
   // Execute the query
   const getJobsQuery = await executeQuery(query);
-  console.log(getJobsQuery);
   if (!getJobsQuery.success) {
     return res.status(404).json({ success: false, payload: { message: "Error while fetching jobs." } });
   }
   const fetchedJobs = getJobsQuery.result[0];
-  console.log(fetchedJobs.length);
-  if (fetchedJobs.length > 0) {
-    return res
-      .status(201)
-      .json({ success: true, payload: { jobs: fetchedJobs, message: "Jobs fetched successfully." } });
+
+  const totalJobs = await executeQuery(countQuery);
+  if (!totalJobs.success) {
+    return res.status(404).json({
+      success: totalJobs.success,
+      payload: { message: "Not Found", result: totalJobs.result },
+    });
   }
-  return res
-    .status(201)
-    .json({ success: false, payload: { jobs: fetchedJobs, message: "There are no active jobs available" } });
+  const totalNumberOfJobs = totalJobs.result[0][0].totalJobs;
+
+  return res.status(200).json({
+    success: true,
+    payload: { jobs: fetchedJobs, message: "There are no active jobs available", total: totalNumberOfJobs },
+  });
 };
 
 const getJobDetails = async (req, res) => {
