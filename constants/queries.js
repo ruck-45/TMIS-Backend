@@ -117,6 +117,8 @@ const createApplicantstableQuery = `CREATE TABLE IF NOT EXISTS applicant (
 const createApplicantQuery = `INSERT INTO applicant (applicant_id, job_id, full_name, email, contact, graduation_year, experience_years, current_employer, current_ctc, expected_ctc, notice_period, current_location) 
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
+const findUserEmailQuery = `SELECT * FROM users WHERE email = ?`;
+
 
 module.exports = {
   checkDatabaseQuery,
@@ -136,4 +138,5 @@ module.exports = {
   updateJobContentQuery,
   createApplicantstableQuery,
   createApplicantQuery,
+  findUserEmailQuery,
 };
