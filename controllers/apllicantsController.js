@@ -26,7 +26,6 @@ const createApplicant = async (req, res) => {
     email,
     contact,
     graduation_year,
-    gender,
     experience_years,
     current_employer,
     current_ctc,
@@ -34,16 +33,19 @@ const createApplicant = async (req, res) => {
     notice_period,
     current_location,
     applicantCounter,
+    id,
   } = req.body;
-  console.log(applicantCounter);
+
   if (
     full_name === undefined ||
     email === undefined ||
     contact === undefined ||
     graduation_year === undefined ||
+    experience_years === undefined ||
     expected_ctc === undefined ||
     current_location === undefined ||
-    applicantCounter === undefined
+    applicantCounter === undefined ||
+    id === undefined
   ) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
@@ -51,11 +53,11 @@ const createApplicant = async (req, res) => {
   try {
     const createApplicant = await executeQuery(createApplicantQuery, [
       applicantId,
+      id,
       full_name,
       email,
       contact,
       graduation_year,
-      gender,
       experience_years,
       current_employer,
       current_ctc,
@@ -63,8 +65,9 @@ const createApplicant = async (req, res) => {
       notice_period,
       current_location,
     ]);
+
     if (!createApplicant.success) {
-      return res.status(404).json({ success: false, payload: { message: "Error occurred while creating applicant." } });
+      return res.status(500).json({ success: false, payload: { message: "Error occurred while creating applicant." } });
     }
     return res.status(201).json({ success: true, payload: { message: "Applicant Created Successfully." } });
   } catch (error) {

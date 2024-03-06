@@ -42,7 +42,6 @@ const updateApplicantRegisterCounter = (req, res, next) => {
   next();
 };
 
-
 module.exports = {
   updateRegisterCounter,
   updateJobRegisterCounter,

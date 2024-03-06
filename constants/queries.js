@@ -100,20 +100,21 @@ const updateJobContentQuery = `UPDATE Jobs_content SET description=?, role=?, ro
 
 const createApplicantstableQuery = `CREATE TABLE IF NOT EXISTS applicant (
                                         applicant_id VARCHAR(255) PRIMARY KEY,
+                                        job_id VARCHAR(255) NOT NULL,
                                         full_name VARCHAR(255) NOT NULL,
                                         email VARCHAR(255) NOT NULL,
                                         contact VARCHAR(15) NOT NULL,
                                         graduation_year DATE NOT NULL,
-                                        gender VARCHAR(10),
                                         experience_years INT,
                                         current_employer VARCHAR(255),
                                         current_ctc FLOAT,
                                         expected_ctc FLOAT NOT NULL,
                                         notice_period INT,
-                                        current_location VARCHAR(255) NOT NULL
+                                        current_location VARCHAR(255) NOT NULL,
+                                        FOREIGN KEY (job_id) REFERENCES Jobs(job_id)
                                     )`;
 
-const createApplicantQuery = `INSERT INTO applicant (applicant_id, full_name, email, contact, graduation_year, gender, experience_years, current_employer, current_ctc, expected_ctc, notice_period, current_location) 
+const createApplicantQuery = `INSERT INTO applicant (applicant_id, job_id, full_name, email, contact, graduation_year, experience_years, current_employer, current_ctc, expected_ctc, notice_period, current_location) 
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
 

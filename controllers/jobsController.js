@@ -9,7 +9,6 @@ const {
   updateJobQuery,
 } = require("../constants/queries");
 
-
 const genJobid = (counter) => {
   // Timestamp component (YYYYMMDDHHMMSS)
   const currentDate = new Date();
@@ -82,7 +81,7 @@ const createJob = async (req, res) => {
 };
 
 const deleteJob = async (req, res) => {
-  const {id: job_id} = req.params;
+  const { id: job_id } = req.params;
   if (job_id === undefined) {
     return res.status(404).json({ success: false, payload: { message: "Job Id must be provided." } });
   }
@@ -160,13 +159,9 @@ const updateJob = async (req, res) => {
 };
 
 const getActiveJobs = async (req, res) => {
-  const { department, jobType, location, experience, start, end } = req.query;
-  const limit_start = start ? parseInt(start, 10) : 0;
-  const limit_end = end ? parseInt(end, 10) : 8;
-
-  if (limit_start >= limit_end) {
-    return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
-  }
+  const { department, jobType, location, experience, start, space } = req.query;
+  const offset = start ? parseInt(start, 10) : 0;
+  const limit = space ? parseInt(space, 10) : 8;
 
   let query = "SELECT * FROM Jobs WHERE 1=1";
   let countQuery = "SELECT COUNT(*) AS totalJobs FROM Jobs WHERE 1=1";
@@ -188,10 +183,7 @@ const getActiveJobs = async (req, res) => {
     countQuery += ` AND experience_level = '${experience}'`;
   }
 
-  query += ` LIMIT ${limit_end} OFFSET ${limit_start}`;
-
-  console.log("query: " + query);
-  console.log("count-query: " + countQuery);
+  query += ` ORDER BY creation_date DESC LIMIT ${limit} OFFSET ${offset}`;
 
   // Execute the query
   const getJobsQuery = await executeQuery(query);
@@ -211,12 +203,12 @@ const getActiveJobs = async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    payload: { jobs: fetchedJobs, message: "There are no active jobs available", total: totalNumberOfJobs },
+    payload: { jobs: fetchedJobs, message: "Job Search Successful", total: totalNumberOfJobs },
   });
 };
 
 const getJobDetailsById = async (req, res) => {
-  const {id: jobId} = req.params;
+  const { id: jobId } = req.params;
 
   if (jobId === undefined) {
     return res.status(404).json({ success: false, payload: { message: "Please Provide Job Id" } });
