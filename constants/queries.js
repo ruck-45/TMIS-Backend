@@ -117,6 +117,8 @@ const createApplicantstableQuery = `CREATE TABLE IF NOT EXISTS applicant (
 const createApplicantQuery = `INSERT INTO applicant (applicant_id, job_id, full_name, email, contact, graduation_year, experience_years, current_employer, current_ctc, expected_ctc, notice_period, current_location) 
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
+const duplicateQuery = `SELECT * FROM applicant WHERE job_id = ? AND email = ?`;                            
+
 const findUserEmailQuery = `SELECT * FROM users WHERE email = ?`;
 
 
@@ -141,4 +143,5 @@ module.exports = {
   createApplicantstableQuery,
   createApplicantQuery,
   findUserEmailQuery,
+  duplicateQuery
 };
