@@ -95,6 +95,7 @@ const insertJobContentQuery = `INSERT INTO Jobs_content (job_id, description, ro
 
 const deleteContentQuery = `DELETE FROM Jobs_content WHERE job_id = ?`;
 const deleteJobQuery = `DELETE FROM Jobs WHERE job_id = ?`;
+const deleteApplicant = `DELETE FROM applicant WHERE job_id = ?`;
 const updateJobQuery = `UPDATE Jobs SET title=?, department=?, job_type=?, experience_level=?, location=?, skills=? WHERE job_id=?`;
 const updateJobContentQuery = `UPDATE Jobs_content SET description=?, role=?, role_category=?, industry=?, required_education=?, required_profile=? WHERE job_id=?`;
 
@@ -143,5 +144,6 @@ module.exports = {
   createApplicantstableQuery,
   createApplicantQuery,
   findUserEmailQuery,
-  duplicateQuery
+  duplicateQuery,
+  deleteApplicant
 };

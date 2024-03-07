@@ -7,6 +7,7 @@ const {
   deleteJobQuery,
   updateJobContentQuery,
   updateJobQuery,
+  deleteApplicant,
 } = require("../constants/queries");
 
 const genJobid = (counter) => {
@@ -86,15 +87,24 @@ const deleteJob = async (req, res) => {
     return res.status(404).json({ success: false, payload: { message: "Job Id must be provided." } });
   }
   try {
+
     const deleteContentResult = await executeQuery(deleteContentQuery, [job_id]);
+
     if (!deleteContentResult.success) {
       return res.status(404).json({ success: false, payload: { message: "Error while deleting job content." } });
     }
-
+    
+    const applicantResult = await executeQuery(deleteApplicant, [job_id]);
+    if (!applicantResult.success) {
+      return res.status(404).json({ success: false, payload: { message: "Error while deleting Applicants" } });
+    }
     const deleteJobResult = await executeQuery(deleteJobQuery, [job_id]);
     if (!deleteJobResult.success) {
       return res.status(404).json({ success: false, payload: { message: "Error while deleting job." } });
     }
+   
+    
+
     return res.status(200).json({ success: true, payload: { message: "Job deleted successfully." } });
   } catch (error) {
     return res.status(500).json({ success: false, payload: { message: "Internal Server error." } });
