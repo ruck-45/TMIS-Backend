@@ -13,7 +13,7 @@ const { updateRegisterCounter } = require("../middlewares/usersMiddlewares");
 const router = express.Router();
 
 // routes
-router.route("/signup").post(createUser);
+router.route("/signup").post(updateRegisterCounter,createUser);
 router.route("/login").post(loginUser);
 
 module.exports = router;
