@@ -5,9 +5,9 @@ const { createApplicant, createApplicantResume, getApplicants } = require("../co
 const path = require("path");
 const multer = require("multer");
 
+router.use("/applicantResumes", express.static("./public/applicantResumes"));
+
 // multer storage setup
-
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -20,16 +20,14 @@ const storage = multer.diskStorage({
 });
 const storeResume = multer({ storage });
 
-router.use("/applicantResumes", express.static("./public/applicantResumes"));
+
+
 // Public routes
-router.route("/apply").post(updateApplicantRegisterCounter, createApplicant);
+router.route("/apply").post( updateApplicantRegisterCounter, createApplicant);
 
+router.route("/uploadResume").post(storeResume.single("resume"), createApplicantResume);
 
-router
-  .route("/uploadResume")
-  .post(storeResume.single("resume"), createApplicantResume);
-
-router.route("/getApplicants").get(getApplicants)
+router.route("/getApplicants").get(getApplicants);
 // Private routes
 
 module.exports = router;

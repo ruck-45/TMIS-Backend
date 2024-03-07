@@ -1,5 +1,5 @@
 const { executeQuery } = require("../utils/database");
-const {createApplicantQuery, getApplicantsQuery}  = require("../constants/queries");
+const { createApplicantQuery, getApplicantsQuery, duplicateQuery } = require("../constants/queries");
 const fs = require("fs");
 const path = require("path");
 
@@ -51,6 +51,13 @@ const createApplicant = async (req, res) => {
   ) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
   }
+
+  const duplicate = await executeQuery(duplicateQuery, [id, email]);
+
+  if (duplicate.result[0].length > 0) {
+    return res.status(500).json({ success: false, payload: { message: "You already applied for this Job" } });
+  }
+  console.log(duplicate.result[0].length);
   const applicantId = genApplicantid(applicantCounter);
   try {
     const createApplicant = await executeQuery(createApplicantQuery, [
@@ -86,12 +93,10 @@ const createApplicant = async (req, res) => {
       resumeInitializationSuccess: true,
       resumePayload: { resumeMessage: "Resume Uploaded Successfully." },
     };
-    return res
-      .status(201)
-      .json({
-        success: true,
-        payload: { message: "Applicant Created Successfully.", ...resumeInitMessage,  applicantId },
-      });
+    return res.status(201).json({
+      success: true,
+      payload: { message: "Applicant Created Successfully.", ...resumeInitMessage, applicantId },
+    });
   } catch (error) {
     console.log("Error", error);
     return res.status(500).json({ success: false, payload: { message: "Internal Server error." } });
@@ -108,27 +113,30 @@ const createApplicantResume = async (req, res) => {
 };
 
 const getApplicants = async (req, res) => {
-    const { jobId, start, end } = req.body;
-    const limit_start = start ? parseInt(start, 10) : 0;
-    const limit_end = end ? parseInt(end, 10) : 8;
+  const { jobId, start, end } = req.body;
+  const limit_start = start ? parseInt(start, 10) : 0;
+  const limit_end = end ? parseInt(end, 10) : 8;
 
-    if (limit_start >= limit_end) {
-      return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
-    }
+  if (limit_start >= limit_end) {
+    return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
+  }
 
-    if ( jobId === undefined) {
-        return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+  if (jobId === undefined) {
+    return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
+  }
+  try {
+    const applicantsQuery = await executeQuery(getApplicantsQuery, [jobId, limit_end, limit_start]);
+    if (!applicantsQuery.success) {
+      return res.status(401).json({ success: false, payload: { message: "Error While fetching applicants." } });
     }
-    try {
-        const applicantsQuery = await executeQuery(getApplicantsQuery, [jobId, limit_end, limit_start]);
-        if (!applicantsQuery.success) { 
-            return res.status(401).json({ success: false, payload: { message: "Error While fetching applicants." } });
-        }
-        return res.status(201).json({ success: false, payload: { applicants: applicantsQuery.result[0], message: "Applicants fetched successfully." } });
-    } catch (error) {
-        
-    }
-}
+    return res
+      .status(201)
+      .json({
+        success: false,
+        payload: { applicants: applicantsQuery.result[0], message: "Applicants fetched successfully." },
+      });
+  } catch (error) {}
+};
 
 module.exports = {
   createApplicant,
