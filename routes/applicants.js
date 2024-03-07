@@ -5,10 +5,9 @@ const { createApplicant, createApplicantResume, getApplicants } = require("../co
 const path = require("path");
 const multer = require("multer");
 
+router.use("/applicantResumes", express.static("./public/applicantResumes"));
+
 // multer storage setup
-
-
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "..", "public", "applicantResumes")); // Folder where Images Are saved
@@ -20,7 +19,8 @@ const storage = multer.diskStorage({
 });
 const storeResume = multer({ storage });
 
-router.use("/applicantResumes", express.static("./public/applicantResumes"));
+
+
 // Public routes
 router.route("/apply").post(updateApplicantRegisterCounter, createApplicant);
 
