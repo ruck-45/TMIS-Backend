@@ -125,7 +125,7 @@ const getApplicants = async (req, res) => {
     if (!applicantsQuery.success) {
       return res.status(500).json({ success: false, payload: { message: "Error While fetching applicants." } });
     }
-    let countQuery = "SELECT COUNT(*) AS totalApplicants FROM applicant WHERE job_id = ?";
+    let countQuery = `SELECT COUNT(*) AS totalApplicants FROM applicant WHERE job_id = ${jobId}`;
     const totalApplicants = await executeQuery(countQuery, [jobId]);
     if (!totalApplicants.success) {
       return res.status(404).json({
