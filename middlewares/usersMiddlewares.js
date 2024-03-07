@@ -2,7 +2,9 @@ let lastResetDate = new Date().getUTCDate();
 let registerCounter = 0;
 let jobCounter = 0;
 let applicantCounter = 0;
-let resumeCounter = 0;
+const fs = require("fs");
+const path = require("path");
+
 const updateRegisterCounter = (req, res, next) => {
   registerCounter += 1;
   const currentDay = new Date().getUTCDate();
@@ -39,6 +41,7 @@ const updateApplicantRegisterCounter = (req, res, next) => {
   }
 
   req.body.applicantCounter = applicantCounter;
+  console.log(req.body);
   next();
 };
 

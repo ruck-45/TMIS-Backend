@@ -120,6 +120,8 @@ const createApplicantQuery = `INSERT INTO applicant (applicant_id, job_id, full_
 const findUserEmailQuery = `SELECT * FROM users WHERE email = ?`;
 
 
+const getApplicantsQuery = `SELECT * FROM applicant WHERE job_id = ? LIMIT ? OFFSET ?`;
+
 module.exports = {
   checkDatabaseQuery,
   createPaymentsTableQuery,

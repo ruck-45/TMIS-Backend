@@ -1,26 +1,35 @@
 const express = require("express");
-const path = require("path");
-const { updateApplicantRegisterCounter } = require("../middlewares/usersMiddlewares");
+const { updateApplicantRegisterCounter, uploadResumeFile } = require("../middlewares/usersMiddlewares");
 const router = express.Router();
+const { createApplicant, createApplicantResume, getApplicants } = require("../controllers/apllicantsController");
+const path = require("path");
 const multer = require("multer");
-const { createApplicant } = require("../controllers/apllicantsController");
 
 // multer storage setup
+
+
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "..", "public", "applications")); // Folder where Images Are saved
+    cb(null, path.join(__dirname, "..", "public", "applicantResumes")); // Folder where Images Are saved
   },
   filename: (req, file, cb) => {
-    // const imageId = req.header("imageId");
-    const imageId = "abcd";
-    cb(null, `${imageId}.pdf`); // file Name
+    const applicantId = req.header("applicantId");
+    cb(null, `${applicantId}.pdf`); // file Name
   },
 });
-const storeProfilePic = multer({ storage });
+const storeResume = multer({ storage });
 
+router.use("/applicantResumes", express.static("./public/applicantResumes"));
 // Public routes
 router.route("/apply").post(updateApplicantRegisterCounter, createApplicant);
 
+
+router
+  .route("/uploadResume")
+  .post(storeResume.single("resume"), createApplicantResume);
+
+router.route("/getApplicants").get(getApplicants)
 // Private routes
 
 module.exports = router;

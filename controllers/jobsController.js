@@ -15,7 +15,7 @@ const genJobid = (counter) => {
   const timestampComponent = currentDate.toISOString().slice(0, 19).replace(/[-:T]/g, "");
 
   // Random component (5 digits)
-  const randomComponent = Math.floor(Math.random() * 600000)
+  const randomComponent = Math.floor(Math.random() * 800000)
     .toString()
     .padStart(5, "0");
 
