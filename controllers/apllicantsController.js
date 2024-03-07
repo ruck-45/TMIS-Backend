@@ -113,13 +113,9 @@ const createApplicantResume = async (req, res) => {
 };
 
 const getApplicants = async (req, res) => {
-  const { jobId, start, end } = req.body;
+  const { id: jobId, start, end } = req.headers;
   const limit_start = start ? parseInt(start, 10) : 0;
   const limit_end = end ? parseInt(end, 10) : 8;
-
-  if (limit_start >= limit_end) {
-    return res.status(400).json({ success: false, payload: { message: "Bad Request" } });
-  }
 
   if (jobId === undefined) {
     return res.status(206).json({ success: false, payload: { message: "Partial Content Provided" } });
@@ -127,15 +123,23 @@ const getApplicants = async (req, res) => {
   try {
     const applicantsQuery = await executeQuery(getApplicantsQuery, [jobId, limit_end, limit_start]);
     if (!applicantsQuery.success) {
-      return res.status(401).json({ success: false, payload: { message: "Error While fetching applicants." } });
+      return res.status(500).json({ success: false, payload: { message: "Error While fetching applicants." } });
     }
-    return res
-      .status(201)
-      .json({
-        success: false,
-        payload: { applicants: applicantsQuery.result[0], message: "Applicants fetched successfully." },
+    let countQuery = "SELECT COUNT(*) AS totalApplicants FROM applicant WHERE job_id = ?";
+    const totalApplicants = await executeQuery(countQuery, [jobId]);
+    if (!totalApplicants.success) {
+      return res.status(404).json({
+        success: totalApplicants.success,
+        payload: { message: "Not Found", result: totalApplicants.result },
       });
-  } catch (error) {}
+    }
+    return res.status(201).json({
+      success: true,
+      payload: { applicants: applicantsQuery.result[0], totalApplicants,  message: "Applicants fetched successfully." },
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, payload: { message: "Error" } });
+  }
 };
 
 module.exports = {

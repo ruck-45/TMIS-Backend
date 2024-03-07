@@ -4,6 +4,7 @@ const router = express.Router();
 const { createApplicant, createApplicantResume, getApplicants } = require("../controllers/apllicantsController");
 const path = require("path");
 const multer = require("multer");
+const passport = require("passport");
 
 router.use("/applicantResumes", express.static("./public/applicantResumes"));
 
@@ -25,7 +26,7 @@ router.route("/apply").post(updateApplicantRegisterCounter, createApplicant);
 
 router.route("/uploadResume").post(storeResume.single("resume"), createApplicantResume);
 
-router.route("/getApplicants").get(getApplicants);
+router.route("/getApplicants").get(passport.authenticate("jwt", { session: false}), getApplicants);
 // Private routes
 
 module.exports = router;
