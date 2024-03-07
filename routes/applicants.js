@@ -22,7 +22,7 @@ const storeResume = multer({ storage });
 
 
 // Public routes
-router.route("/apply").post(updateApplicantRegisterCounter, createApplicant);
+router.route("/apply").post(upload,updateApplicantRegisterCounter, createApplicant);
 
 
 router
