@@ -17,7 +17,6 @@ const options = {
 };
 
 const strategy = new Strategy(options, (payload, done) => {
-  console.log(payload.uid)
   executeQuery(findUserByIdQuery, [payload.uid])
     .then((qreryRes) => {
       const userDetails = qreryRes.result[0];

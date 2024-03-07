@@ -30,18 +30,18 @@ const genJobid = (counter) => {
 
 const createJob = async (req, res) => {
   const {
-    title,
-    department,
-    job_type,
-    experience_level,
-    location,
-    skills,
-    description,
+    position,
+    jobdes,
     role,
-    role_category,
-    industry,
-    required_education,
-    required_profile,
+    department,
+    industryType,
+    employmentType,
+    loc,
+    exp,
+    category,
+    skills,
+    education,
+    profile,
     jobCounter,
   } = req.body;
 
@@ -49,11 +49,11 @@ const createJob = async (req, res) => {
     const job_id = genJobid(jobCounter);
     const query1 = await executeQuery(insertJobQuery, [
       job_id,
-      title,
+      position,
       department,
-      job_type,
-      experience_level,
-      location,
+      employmentType,
+      exp,
+      loc,
       JSON.stringify(skills),
     ]);
 
@@ -63,12 +63,12 @@ const createJob = async (req, res) => {
 
     const query2 = await executeQuery(insertJobContentQuery, [
       job_id,
-      description,
+      jobdes,
       role,
-      role_category,
-      industry,
-      JSON.stringify(required_education),
-      JSON.stringify(required_profile),
+      category,
+      industryType,
+      JSON.stringify(education),
+      JSON.stringify(profile),
     ]);
     if (!query2.success) {
       return res.status(404).json({ success: false, payload: { message: "Error while creating jobs content" } });

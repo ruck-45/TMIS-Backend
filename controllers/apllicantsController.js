@@ -55,7 +55,7 @@ const createApplicant = async (req, res) => {
   const duplicate = await executeQuery(duplicateQuery, [id, email]);
 
   if (duplicate.result[0].length > 0) {
-    return res.status(500).json({ success: false, payload: { message: "You already applied for this Job" } });
+    return res.status(406).json({ success: false, payload: { message: "You already applied for this Job" } });
   }
   console.log(duplicate.result[0].length);
   const applicantId = genApplicantid(applicantCounter);

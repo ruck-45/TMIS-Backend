@@ -20,10 +20,8 @@ const storage = multer.diskStorage({
 });
 const storeResume = multer({ storage });
 
-
-
 // Public routes
-router.route("/apply").post( updateApplicantRegisterCounter, createApplicant);
+router.route("/apply").post(updateApplicantRegisterCounter, createApplicant);
 
 router.route("/uploadResume").post(storeResume.single("resume"), createApplicantResume);
 
